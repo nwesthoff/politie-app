@@ -1,37 +1,10 @@
 import React, { Component } from "react";
 import ReactMapboxGl, { Marker, Layer, Feature } from "react-mapbox-gl";
 import styled from "styled-components";
+import { Grid } from "@material-ui/core";
 
-const layerPaint = {
-  "heatmap-weight": {
-    property: "priceIndicator",
-    type: "exponential",
-    stops: [[0, 0], [5, 2]]
-  },
-  "heatmap-intensity": {
-    stops: [[0, 0], [5, 1.2]]
-  },
-  "heatmap-color": [
-    "interpolate",
-    ["linear"],
-    ["heatmap-density"],
-    0,
-    "rgba(33,102,172,0)",
-    0.25,
-    "rgb(103,169,207)",
-    0.5,
-    "rgb(209,229,240)",
-    0.8,
-    "rgb(253,219,199)",
-    1,
-    "rgb(239,138,98)",
-    2,
-    "rgb(178,24,43)"
-  ],
-  "heatmap-radius": {
-    stops: [[0, 1], [5, 50]]
-  }
-};
+import extrusionLayer from "./threedeelayer";
+import heatmapLayer from "./heatmaplayer";
 
 const Map = styled(
   ReactMapboxGl({
@@ -55,8 +28,13 @@ export default class HeatMap extends Component {
 
     this.state = {
       agentLocation: [5.9726903, 50.882751000000006],
-      zoom: [15],
-      meldingen: this.props.meldingen ? Object.values(this.props.meldingen) : []
+      zoom: [13],
+      bearing: [0],
+      pitch: [45],
+      meldingen: this.props.meldingen
+        ? Object.values(this.props.meldingen)
+        : [],
+      detachedCenter: [5.9726903, 50.882751000000006]
     };
   }
 
@@ -84,7 +62,13 @@ export default class HeatMap extends Component {
   render() {
     return (
       <Map
-        center={this.state.agentLocation}
+        center={
+          this.state.detachedCenter !== undefined
+            ? this.state.detachedCenter
+            : this.state.agentLocation
+        }
+        pitch={this.state.pitch}
+        bearing={this.state.bearing}
         zoom={this.state.zoom}
         style="mapbox://styles/mapbox/light-v9"
         containerStyle={{
@@ -97,7 +81,16 @@ export default class HeatMap extends Component {
             <Mark />
           </Marker>
         )}
-        <Layer type="heatmap" paint={layerPaint}>
+        <Layer
+          id="3d-buildings"
+          sourceId="composite"
+          sourceLayer="building"
+          filter={["==", "extrude", "true"]}
+          type="fill-extrusion"
+          minZoom={14}
+          paint={extrusionLayer}
+        />
+        <Layer type="heatmap" paint={heatmapLayer}>
           {this.state.meldingen.length > 0 &&
             this.state.meldingen
               .filter(melding => {
@@ -118,10 +111,19 @@ export default class HeatMap extends Component {
   }
 }
 
-const Mark = styled.div`
-  font-size: 2.4em;
-
-  &:after {
-    content: "🚓";
+export class Mark extends Component {
+  render() {
+    return (
+      <StyledMark>
+        <Grid container direction="column" justify="center">
+          <Grid item>🚓</Grid>
+          <Grid item>Danny</Grid>
+        </Grid>
+      </StyledMark>
+    );
   }
+}
+
+const StyledMark = styled(Mark)`
+  font-size: 2.4em;
 `;
