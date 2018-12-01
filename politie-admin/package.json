@@ -4,6 +4,8 @@
   "description": "A Police Admin for the weird hackathon app we are making",
   "main": "index.js",
   "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +21,16 @@
   "bugs": {
     "url": "https://github.com/nwesthoff/politie-app/issues"
   },
-  "homepage": "https://github.com/nwesthoff/politie-app#readme"
+  "homepage": "https://github.com/nwesthoff/politie-app#readme",
+  "devDependencies": {
+    "parcel": "^1.10.3"
+  },
+  "dependencies": {
+    "@material-ui/core": "^3.6.0",
+    "mapbox-gl": "^0.51.0",
+    "prop-types": "^15.6.2",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-mapbox-gl": "^4.0.2"
+  }
 }
