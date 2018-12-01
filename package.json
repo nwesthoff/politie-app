@@ -1,0 +1,23 @@
+{
+  "name": "politie-admin-panel",
+  "version": "1.0.0",
+  "description": "A Police Admin for the weird hackathon app we are making",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nwesthoff/politie-app.git"
+  },
+  "keywords": [
+    "weet",
+    "niet"
+  ],
+  "author": "een groepje mensen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nwesthoff/politie-app/issues"
+  },
+  "homepage": "https://github.com/nwesthoff/politie-app#readme"
+}
