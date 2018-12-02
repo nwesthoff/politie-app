@@ -78,24 +78,26 @@ export default class HeatMap extends Component {
           minZoom={14}
           paint={extrusionLayer}
         />
-        <Layer type="heatmap" paint={heatmapLayer}>
-          {Object.values(this.props.cases).length > 0 &&
-            Object.values(this.props.cases)
-              .filter(melding => {
-                return (
-                  melding.location &&
-                  melding.location.lat &&
-                  melding.location.lng
-                );
-              })
-              .map((melding, index) => (
-                <Feature
-                  key={index}
-                  coordinates={[melding.location.lng, melding.location.lat]}
-                  properties={melding}
-                />
-              ))}
-        </Layer>
+        {this.props.cases && (
+          <Layer type="heatmap" paint={heatmapLayer}>
+            {Object.values(this.props.cases).length > 0 &&
+              Object.values(this.props.cases)
+                .filter(melding => {
+                  return (
+                    melding.location &&
+                    melding.location.lat &&
+                    melding.location.lng
+                  );
+                })
+                .map((melding, index) => (
+                  <Feature
+                    key={index}
+                    coordinates={[melding.location.lng, melding.location.lat]}
+                    properties={melding}
+                  />
+                ))}
+          </Layer>
+        )}
         {this.props.currentMarker.lng && (
           <Marker coordinates={this.props.currentMarker}>
             <MarkTarget />

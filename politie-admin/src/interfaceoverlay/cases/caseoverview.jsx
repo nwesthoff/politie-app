@@ -18,6 +18,9 @@ export default class CaseOverview extends Component {
   }
 
   manipulatedCases = cases => {
+    if (!cases || cases === undefined) {
+      return [];
+    }
     const arrCases = Object.values(cases);
 
     const distanceEnabledCases = arrCases
