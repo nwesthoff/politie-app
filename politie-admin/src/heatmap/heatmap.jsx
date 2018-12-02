@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import ReactMapboxGl, { Marker, Layer, Feature } from "react-mapbox-gl";
+import ReactMapboxGl, { Marker, Layer, Feature, Popup } from "react-mapbox-gl";
 import styled from "styled-components";
+
+import meldingImageSrc from "../assets/melding-sprite.png";
 
 import extrusionLayer from "./threedeelayer";
 import heatmapLayer from "./heatmaplayer";
@@ -14,6 +16,20 @@ const Map = styled(
   color: black;
 `;
 
+const StyledPopup = styled.div`
+  background: white;
+  color: #3f618c;
+  font-weight: 400;
+  padding: 5px;
+  border-radius: 2px;
+`;
+
+const layoutLayer = { "icon-image": "meldingImage" };
+
+const meldingSprite = new Image();
+meldingSprite.src = meldingImageSrc;
+const meldingImages = ["meldingImage", meldingSprite];
+
 export default class HeatMap extends Component {
   constructor(props) {
     super(props);
@@ -26,7 +42,8 @@ export default class HeatMap extends Component {
       pitch: [30],
       cases: [],
       detachedCenter: undefined,
-      fitBounds: null
+      fitBounds: null,
+      melding: undefined
     };
   }
 
@@ -40,8 +57,6 @@ export default class HeatMap extends Component {
       newFitBounds = null;
     }
 
-    console.log(newFitBounds);
-
     this.setState({
       fitBounds: newFitBounds
     });
@@ -50,6 +65,14 @@ export default class HeatMap extends Component {
   componentDidMount() {
     this.getFitBounds();
   }
+
+  markerClick = (melding, { feature }) => {
+    this.setState({
+      center: feature.geometry.coordinates,
+      zoom: [14],
+      melding
+    });
+  };
 
   render() {
     return (
@@ -109,6 +132,34 @@ export default class HeatMap extends Component {
             <MarkPolice />
           </Marker>
         )}
+          <Layer
+            type="symbol"
+            id="marker"
+            layout={layoutLayer}
+            images={meldingImages}
+          >
+            {Object.values(this.props.meldingen)
+              .filter(melding => {
+                return (
+                  melding.location &&
+                  melding.location.lat &&
+                  melding.location.lng
+                );
+              })
+              .sort(
+                (firstMelding, secondMelding) =>
+                  firstMelding.timestamp > secondMelding.timestamp
+              )
+              .slice(0, 50)
+              .map((melding, index) => {
+                return (
+                  <Feature
+                    key={index}
+                    coordinates={[melding.location.lng, melding.location.lat]}
+                  />
+                );
+              })}
+          </Layer>
       </Map>
     );
   }
