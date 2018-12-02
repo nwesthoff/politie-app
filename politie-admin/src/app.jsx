@@ -17,7 +17,7 @@ export default class App extends Component {
     super(props);
 
     this.state = {
-      agentLocation: [5.9726903, 50.282751000000006],
+      agentLocation: this.props.agentLocation || [5.9726903, 50.282751000000006],
       currentMarker: {}
     };
   }
@@ -43,8 +43,17 @@ export default class App extends Component {
     navigator.geolocation.clearWatch(this.watchId);
   };
 
-  createMarker = marker => {
-    this.setState({ currentMarker: marker });
+  createMarker = (marker, index) => {
+    let newMarkerValue = {};
+
+    if (
+      marker.lat !== this.state.currentMarker.lat ||
+      marker.lng !== this.state.currentMarker.lng
+    ) {
+      newMarkerValue = marker;
+    }
+
+    this.setState({ currentMarker: newMarkerValue, selectedCase: index });
   };
 
   render() {

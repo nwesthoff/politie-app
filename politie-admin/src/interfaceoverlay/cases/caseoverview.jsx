@@ -1,16 +1,9 @@
-import React, { Component, Fragment } from "react";
-import {
-  Button,
-  Grid,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon
-} from "@material-ui/core";
+import React, { Component } from "react";
+import { Button, Grid, List, ListItem, ListItemText } from "@material-ui/core";
 
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import geolib from "geolib";
+const geodist = require("geodist");
 
 import SingleCase from "./singlecase";
 
@@ -30,9 +23,9 @@ export default class CaseOverview extends Component {
   };
 
   manipulatedCases = () => {
-    const slicedCases = Object.values(this.state.cases);
+    const arrCases = Object.values(this.state.cases);
 
-    const distanceEnabledCases = slicedCases
+    const distanceEnabledCases = arrCases
       .filter(singleCase => {
         return (
           singleCase.location &&
@@ -41,16 +34,20 @@ export default class CaseOverview extends Component {
         );
       })
       .map(singleCase => {
-        singleCase.distance = geolib.getDistance(
-          {
-            latitude: singleCase.location.lat,
-            longitude: singleCase.location.lng
-          },
-          {
-            latitude: this.props.agentLocation[1],
-            longitude: this.props.agentLocation[0]
-          }
-        );
+        const agentLocation = {
+          lat: this.props.agentLocation[1],
+          lon: this.props.agentLocation[0]
+        };
+
+        const caseLocation = {
+          lat: singleCase.location.lat,
+          lon: singleCase.location.lng
+        };
+
+        singleCase.distance = geodist(agentLocation, caseLocation, {
+          exact: true,
+          unit: "m"
+        });
 
         return singleCase;
       });
@@ -59,9 +56,7 @@ export default class CaseOverview extends Component {
       return prevCase.distance - nextCase.distance;
     });
 
-    this.setState({
-      distanceSortedCases: sortedCases
-    });
+    return sortedCases;
   };
 
   showMoreCases = () => {
@@ -77,18 +72,17 @@ export default class CaseOverview extends Component {
   };
 
   render() {
+    console.log(this.props.cases);
+
     if (this.props.agentLocation === undefined) {
       return null;
-    } else if (
-      this.state.distanceSortedCases &&
-      this.state.distanceSortedCases.length > 0
-    ) {
+    } else if (this.manipulatedCases() && this.manipulatedCases().length > 0) {
       return (
         <Grid container direction="column">
           <Grid item>
             <List>
-              {this.state.distanceSortedCases.length > 0 &&
-                this.state.distanceSortedCases
+              {this.manipulatedCases().length > 0 &&
+                this.manipulatedCases()
                   .slice(0, this.state.casesShown)
                   .map((singleCase, index) => (
                     <SingleCase

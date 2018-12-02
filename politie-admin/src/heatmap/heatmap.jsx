@@ -69,16 +69,6 @@ export default class HeatMap extends Component {
           width: "100%"
         }}
       >
-        {this.props.agentLocation && (
-          <Marker coordinates={this.props.agentLocation}>
-            <MarkPolice />
-          </Marker>
-        )}
-        {this.props.currentMarker.lng && (
-          <Marker coordinates={this.props.currentMarker}>
-            <MarkTarget />
-          </Marker>
-        )}
         <Layer
           id="3d-buildings"
           sourceId="composite"
@@ -106,6 +96,17 @@ export default class HeatMap extends Component {
                 />
               ))}
         </Layer>
+        {this.props.currentMarker.lng && (
+          <Marker coordinates={this.props.currentMarker}>
+            <MarkTarget />
+          </Marker>
+        )}
+
+        {this.props.agentLocation && (
+          <Marker coordinates={this.props.agentLocation}>
+            <MarkPolice />
+          </Marker>
+        )}
       </Map>
     );
   }
