@@ -24,7 +24,7 @@ export default class HeatMap extends Component {
       zoom: [13],
       bearing: [0],
       pitch: [30],
-      cases: this.props.cases ? Object.values(this.props.cases) : [],
+      cases: [],
       detachedCenter: undefined,
       fitBounds: null
     };
@@ -79,8 +79,8 @@ export default class HeatMap extends Component {
           paint={extrusionLayer}
         />
         <Layer type="heatmap" paint={heatmapLayer}>
-          {this.state.cases.length > 0 &&
-            this.state.cases
+          {Object.values(this.props.cases).length > 0 &&
+            Object.values(this.props.cases)
               .filter(melding => {
                 return (
                   melding.location &&

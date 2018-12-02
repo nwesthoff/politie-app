@@ -17,7 +17,10 @@ export default class App extends Component {
     super(props);
 
     this.state = {
-      agentLocation: this.props.agentLocation || [5.9726903, 50.282751000000006],
+      agentLocation: this.props.agentLocation || [
+        5.9726903,
+        50.282751000000006
+      ],
       currentMarker: {}
     };
   }
@@ -86,5 +89,6 @@ export default class App extends Component {
 
 fb.on("value", snapshot => {
   const store = snapshot.val();
+  console.log(store);
   ReactDOM.render(<App {...store} />, document.getElementById("root"));
 });

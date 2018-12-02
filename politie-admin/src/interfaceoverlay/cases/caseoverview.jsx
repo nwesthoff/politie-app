@@ -12,18 +12,13 @@ export default class CaseOverview extends Component {
     super(props);
 
     this.state = {
-      cases: this.props.cases || [],
       distanceSortedCases: [],
       casesShown: 5
     };
   }
 
-  componentDidMount = () => {
-    this.manipulatedCases();
-  };
-
-  manipulatedCases = () => {
-    const arrCases = Object.values(this.state.cases);
+  manipulatedCases = cases => {
+    const arrCases = Object.values(cases);
 
     const distanceEnabledCases = arrCases
       .filter(singleCase => {
@@ -72,25 +67,24 @@ export default class CaseOverview extends Component {
   };
 
   render() {
-    console.log(this.props.cases);
+    const distanceSortedCases = this.manipulatedCases(this.props.cases);
 
     if (this.props.agentLocation === undefined) {
       return null;
-    } else if (this.manipulatedCases() && this.manipulatedCases().length > 0) {
+    } else if (this.props.cases && distanceSortedCases.length > 0) {
       return (
         <Grid container direction="column">
           <Grid item>
             <List>
-              {this.manipulatedCases().length > 0 &&
-                this.manipulatedCases()
-                  .slice(0, this.state.casesShown)
-                  .map((singleCase, index) => (
-                    <SingleCase
-                      case={singleCase}
-                      createMarkerCb={this.props.createMarkerCb}
-                      key={index}
-                    />
-                  ))}
+              {distanceSortedCases
+                .slice(0, this.state.casesShown)
+                .map((singleCase, index) => (
+                  <SingleCase
+                    case={singleCase}
+                    createMarkerCb={this.props.createMarkerCb}
+                    key={index}
+                  />
+                ))}
             </List>
           </Grid>
           <Grid item style={{ padding: "0 1.2rem" }}>
