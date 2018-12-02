@@ -1,14 +1,8 @@
 import React, { Component } from "react";
-import {
-  Divider,
-  Typography,
-  Drawer,
-  Grid,
-  List,
-  ListItem,
-  ListItemText
-} from "@material-ui/core";
+import { Drawer, List, Divider, ListSubheader } from "@material-ui/core";
 import styled from "styled-components";
+
+import CaseOverview from "./cases/caseoverview";
 
 const StyledInterfaceOverlay = styled.div`
   position: relative;
@@ -24,22 +18,18 @@ export default class InterfaceOverlay extends Component {
     };
   }
 
-  toggleDrawer = (side, open) => () => {
-    this.setState({
-      [side]: open
-    });
-  };
-
   render() {
     return (
       <StyledInterfaceOverlay>
         <Drawer variant="permanent" anchor="left">
           <List>
-            {["Route", "Acties", "Meldingen"].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
+            <ListSubheader>Cases</ListSubheader>
+            <CaseOverview
+              agentLocation={this.props.agentLocation}
+              cases={this.props.cases}
+              createMarkerCb={this.props.createMarkerCb}
+            />
+            <Divider />
           </List>
         </Drawer>
       </StyledInterfaceOverlay>

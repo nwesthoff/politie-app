@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ReactMapboxGl, { Marker, Layer, Feature } from "react-mapbox-gl";
 import styled from "styled-components";
-import { Grid } from "@material-ui/core";
 
 import extrusionLayer from "./threedeelayer";
 import heatmapLayer from "./heatmaplayer";
@@ -12,12 +11,7 @@ const Map = styled(
       "pk.eyJ1Ijoibmlsc3dlc3Rob2ZmIiwiYSI6ImNqcDU5bmptMTA2NGYzcm84bWU1MDM5b3gifQ.g48vkOiMRECoKa6uN1EuDA"
   })
 )`
-  z-index: 0;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  color: black;
 `;
 
 export default class HeatMap extends Component {
@@ -27,37 +21,35 @@ export default class HeatMap extends Component {
     this.watchId = undefined;
 
     this.state = {
-      agentLocation: [5.9726903, 50.882751000000006],
       zoom: [13],
       bearing: [0],
-      pitch: [45],
-      meldingen: this.props.meldingen
-        ? Object.values(this.props.meldingen)
-        : [],
-      detachedCenter: [5.9726903, 50.882751000000006]
+      pitch: [30],
+      cases: this.props.cases ? Object.values(this.props.cases) : [],
+      detachedCenter: undefined,
+      fitBounds: null
     };
   }
 
-  componentDidMount = () => {
-    this.watchId = navigator.geolocation.watchPosition(
-      location => {
-        if (location) {
-          this.setState({
-            agentLocation: [location.coords.longitude, location.coords.latitude]
-          });
-        }
-      },
-      e => {
-        console.log(e);
-      },
-      {
-        enableHighAccuracy: true
-      }
-    );
+  getFitBounds = () => {
+    let newFitBounds = [
+      this.props.agentLocation,
+      [this.props.currentMarker.lng, this.props.currentMarker.lat]
+    ];
+
+    if (this.props.currentMarker.lng === undefined) {
+      newFitBounds = null;
+    }
+
+    console.log(newFitBounds);
+
+    this.setState({
+      fitBounds: newFitBounds
+    });
   };
-  componentWillUnmount = () => {
-    navigator.geolocation.clearWatch(this.watchId);
-  };
+
+  componentDidMount() {
+    this.getFitBounds();
+  }
 
   render() {
     return (
@@ -65,8 +57,9 @@ export default class HeatMap extends Component {
         center={
           this.state.detachedCenter !== undefined
             ? this.state.detachedCenter
-            : this.state.agentLocation
+            : this.props.agentLocation
         }
+        fitBounds={this.state.fitBounds}
         pitch={this.state.pitch}
         bearing={this.state.bearing}
         zoom={this.state.zoom}
@@ -76,9 +69,14 @@ export default class HeatMap extends Component {
           width: "100%"
         }}
       >
-        {this.state.agentLocation && (
-          <Marker coordinates={this.state.agentLocation}>
-            <Mark />
+        {this.props.agentLocation && (
+          <Marker coordinates={this.props.agentLocation}>
+            <MarkPolice />
+          </Marker>
+        )}
+        {this.props.currentMarker.lng && (
+          <Marker coordinates={this.props.currentMarker}>
+            <MarkTarget />
           </Marker>
         )}
         <Layer
@@ -91,17 +89,19 @@ export default class HeatMap extends Component {
           paint={extrusionLayer}
         />
         <Layer type="heatmap" paint={heatmapLayer}>
-          {this.state.meldingen.length > 0 &&
-            this.state.meldingen
+          {this.state.cases.length > 0 &&
+            this.state.cases
               .filter(melding => {
                 return (
-                  melding.locatie && melding.locatie.lat && melding.locatie.lng
+                  melding.location &&
+                  melding.location.lat &&
+                  melding.location.lng
                 );
               })
               .map((melding, index) => (
                 <Feature
                   key={index}
-                  coordinates={[melding.locatie.lng, melding.locatie.lat]}
+                  coordinates={[melding.location.lng, melding.location.lat]}
                   properties={melding}
                 />
               ))}
@@ -111,19 +111,18 @@ export default class HeatMap extends Component {
   }
 }
 
-export class Mark extends Component {
-  render() {
-    return (
-      <StyledMark>
-        <Grid container direction="column" justify="center">
-          <Grid item>🚓</Grid>
-          <Grid item>Danny</Grid>
-        </Grid>
-      </StyledMark>
-    );
-  }
-}
-
-const StyledMark = styled(Mark)`
+const MarkPolice = styled.div`
   font-size: 2.4em;
+
+  &:after {
+    content: "👮🏻‍";
+  }
+`;
+
+const MarkTarget = styled.div`
+  font-size: 2.4em;
+
+  &:after {
+    content: "😈";
+  }
 `;
